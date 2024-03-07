@@ -10,15 +10,16 @@ int main()
 {
     short headDir[2] = {0, 1}, tailDir[2] = {headDir[0], headDir[1]};
     Initialize_variables();
-    char input = *bufferFront;
+    char newInput, currentInput = *bufferFront;
     chrono::milliseconds delay(200);
+    mapPrinter();
     while (true)
     {
-        reprint();
+        this_thread::sleep_for(delay);
         while (kbhit())
         {
-            char temp = tolower(getch());
-            if (temp == 'p')
+            newInput = tolower(getch());
+            if (newInput == 'p')
             {
                 cout << "game paused" << endl;
                 char unpause = '0';
@@ -31,27 +32,26 @@ int main()
                 this_thread::sleep_for(delay);
                 if (kbhit())
                 {
-                    temp = tolower(getch());
+                    newInput = tolower(getch());
                 }
             }
-            if (bufferedInput < BUFFER_SIZE && isValidInput(temp, input))
+            if (bufferedInput < BUFFER_SIZE && isValidInput(newInput, currentInput))
             {
-                inputBuffer[inputIndex] = temp;
+                inputBuffer[inputIndex] = newInput;
                 bufferedInput++;
                 inputIndex = (inputIndex + 1) % BUFFER_SIZE;
             }
         }
         if (bufferedInput > 0)
         {
-            input = *bufferFront;
+            currentInput = *bufferFront;
             bufferFront = &inputBuffer[(bufferFront - inputBuffer + 1) % BUFFER_SIZE];
             bufferedInput--;
 
-            changeDirection(input, headDir);
+            changeDirection(currentInput, headDir);
         }
         updatePosition(headDir, tailDir,turnsFront);
-
-        this_thread::sleep_for(delay);
+        reprint();
     }
     return 0;
 }
