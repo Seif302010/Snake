@@ -2,7 +2,7 @@
 
 const short n = 8, BUFFER_SIZE = 5;
 
-char e = 254, sound = 7, head = '$', body = '*', inputBuffer[BUFFER_SIZE], Map[n][n];
+char e = 254, sound = 7, head = '$', body = '*', tail = body, inputBuffer[BUFFER_SIZE], Map[n][n];
 short headPos[2] = {0, 0}, tailPos[2] = {0, 0}, bufferedInput = 0, inputIndex = 0, length = 3, turns[n * n][4], turnIndex = 0;
 
 void clearScreen()
@@ -40,10 +40,10 @@ void updatePosition(short hDir[2], short tDir[2], short (*&turnsFront)[4])
         turnsFront = &turns[(turnsFront - turns + 1) % (n * n)];
     }
     short newTailX = (tailPos[0] + tDir[0] + n) % n, newTailY = (tailPos[1] + tDir[1] + n) % n;
-    Map[newTailX][newTailY] = Map[tailPos[0]][tailPos[1]];
-    Map[tailPos[0]][tailPos[1]] = e;
-    Map[newHeadX][newHeadY] = Map[headPos[0]][headPos[1]];
     Map[headPos[0]][headPos[1]] = body;
+    Map[tailPos[0]][tailPos[1]] = e;
+    Map[newTailX][newTailY] = tail;
+    Map[newHeadX][newHeadY] = head;
     headPos[0] = newHeadX;
     headPos[1] = newHeadY;
     tailPos[0] = newTailX;
@@ -74,6 +74,7 @@ void Initialize_variables()
 
 bool isValidInput(const char &input, const char &previousInput)
 {
+//    return input == 'w' || input == 'a' || input == 's' || input == 'd';
     if (previousInput == 'w' || previousInput == 's')
         return input == 'a' || input == 'd';
     else if (previousInput == 'a' || previousInput == 'd')

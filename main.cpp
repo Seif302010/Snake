@@ -22,24 +22,26 @@ int main()
             if (newInput == 'p')
             {
                 cout << "game paused" << endl;
-                char unpause = '0';
-                while (unpause != 'p')
-                {
+                newInput = '0';
+                while (newInput != 'p')
                     if (kbhit())
-                        unpause = tolower(getch());
-                }
+                        newInput = tolower(getch());
                 reprint();
                 this_thread::sleep_for(delay);
                 if (kbhit())
-                {
                     newInput = tolower(getch());
-                }
             }
             if (bufferedInput < BUFFER_SIZE && isValidInput(newInput, currentInput))
             {
                 inputBuffer[inputIndex] = newInput;
                 bufferedInput++;
                 inputIndex = (inputIndex + 1) % BUFFER_SIZE;
+                currentInput = newInput;
+//                if(bufferedInput == BUFFER_SIZE){
+//                    clearScreen();
+//                    cout<<"the buffer is full "<<endl;
+//                    while(true);
+//                }
             }
         }
         if (bufferedInput > 0)
