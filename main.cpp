@@ -23,7 +23,7 @@ int main()
             if (newInput == 'p')
             {
                 cout << "game paused" << endl;
-                currentInput = bufferedInput ? reverseInput(currentInput) : currentInput;
+                currentInput = bufferedInput % 2 ? reverseInput(currentInput) : currentInput;
                 bufferedInput = 0;
                 bufferFront = inputBuffer;
                 bufferRear = inputBuffer;
