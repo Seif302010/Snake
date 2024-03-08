@@ -3,7 +3,7 @@
 using namespace std;
 
 char *bufferFront = inputBuffer,*bufferRear = inputBuffer;
-short (*turnsFront)[4] = turns;
+short (*turnsFront)[4] = turns,(*turnsRear)[4] = turns;
 
 
 int main()
@@ -55,7 +55,7 @@ int main()
             bufferFront = &inputBuffer[(bufferFront - inputBuffer + 1) % BUFFER_SIZE];
             bufferedInput--;
 
-            changeDirection(currentInput, headDir);
+            changeDirection(currentInput, headDir,turnsRear);
         }
         updatePosition(headDir, tailDir,turnsFront);
         reprint();

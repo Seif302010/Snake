@@ -3,7 +3,7 @@
 const short n = 8, BUFFER_SIZE = 3;
 
 char e = 254, sound = 7, head = '$', body = '*', tail = body, inputBuffer[BUFFER_SIZE], Map[n][n];
-short headPos[2] = {0, 0}, tailPos[2] = {0, 0}, bufferedInput = 0, length = 3, turns[n * n][4], turnIndex = 0;
+short headPos[2] = {0, 0}, tailPos[2] = {0, 0}, bufferedInput = 0, length = 3, turns[n * n][4];
 
 void clearScreen()
 {
@@ -86,17 +86,17 @@ bool isValidInput(const char &input, const char &previousInput)
            (isHorizontal(previousInput) && isVertical(input));
 }
 
-void changeDirection(const char &input, short headDir[2])
+void changeDirection(const char &input, short headDir[2], short (*&turnsRear)[4])
 {
 //    if (isValidInput(input, previousInput))
 //    {
         headDir[0] = input == 'w' ? -1 : input == 's' ? 1 : 0;
         headDir[1] = input == 'a' ? -1 : input == 'd' ? 1 : 0;
-        turns[turnIndex][0] = headPos[0];
-        turns[turnIndex][1] = headPos[1];
-        turns[turnIndex][2] = headDir[0] != 0 ? 0 : 1;
-        turns[turnIndex][3] = headDir[0] != 0 ? headDir[0] : headDir[1];
-        turnIndex = (turnIndex + 1) % (n * n);
+        (*turnsRear)[0] = headPos[0];
+        (*turnsRear)[1] = headPos[1];
+        (*turnsRear)[2] = headDir[0] ? 0 : 1;
+        (*turnsRear)[3] = headDir[0] ? headDir[0] : headDir[1];
+        turnsRear = &turns[(turnsRear - turns + 1) % (n * n)];
 //    }
 }
 

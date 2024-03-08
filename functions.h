@@ -10,7 +10,7 @@ using namespace std;
 extern const short n, BUFFER_SIZE;
 
 extern char e, sound, head, body, inputBuffer[3], Map[][8];
-extern short headPos[2], tailPos[2], bufferedInput, length, turns[][4], turnIndex;
+extern short headPos[2], tailPos[2], bufferedInput, length, turns[][4];
 
 void clearScreen();
 void mapPrinter();
@@ -18,7 +18,7 @@ void reprint();
 void updatePosition(short hDir[2], short tDir[2], short (*&turnsFront)[4]);
 void Initialize_variables();
 bool isValidInput(const char &input, const char &previousInput);
-void changeDirection(const char &input, short headDir[2]);
+void changeDirection(const char &input, short headDir[2], short (*&turnsFront)[4]);
 char reverseInput(const char &input);
 
 #endif // FUNCTIONS_H_INCLUDED
