@@ -1,9 +1,9 @@
 #include "functions.h"
 
-const short n = 8, BUFFER_SIZE = 5;
+const short n = 8, BUFFER_SIZE = 3;
 
 char e = 254, sound = 7, head = '$', body = '*', tail = body, inputBuffer[BUFFER_SIZE], Map[n][n];
-short headPos[2] = {0, 0}, tailPos[2] = {0, 0}, bufferedInput = 0, inputIndex = 0, length = 3, turns[n * n][4], turnIndex = 0;
+short headPos[2] = {0, 0}, tailPos[2] = {0, 0}, bufferedInput = 0, length = 3, turns[n * n][4], turnIndex = 0;
 
 void clearScreen()
 {
@@ -72,14 +72,18 @@ void Initialize_variables()
     inputBuffer[0] = 'd';
 }
 
+bool isVertical(const char &input){
+    return input == 'w' || input == 's';
+}
+
+bool isHorizontal(const char &input){
+    return input == 'a' || input == 'd';
+}
+
 bool isValidInput(const char &input, const char &previousInput)
 {
-//    return input == 'w' || input == 'a' || input == 's' || input == 'd';
-    if (previousInput == 'w' || previousInput == 's')
-        return input == 'a' || input == 'd';
-    else if (previousInput == 'a' || previousInput == 'd')
-        return input == 'w' || input == 's';
-    return false;
+    return (isVertical(previousInput) && isHorizontal(input)) ||
+           (isHorizontal(previousInput) && isVertical(input));
 }
 
 void changeDirection(const char &input, short headDir[2])
@@ -94,4 +98,8 @@ void changeDirection(const char &input, short headDir[2])
         turns[turnIndex][3] = headDir[0] != 0 ? headDir[0] : headDir[1];
         turnIndex = (turnIndex + 1) % (n * n);
 //    }
+}
+
+char reverseInput(const char &input){
+    return isVertical(input) ? 'a' : 'w';
 }

@@ -1,11 +1,11 @@
 # depslib dependency file v1.0
-1709841818 source:d:\cpp\snake\main.cpp
+1709856549 source:d:\cpp\snake\main.cpp
 	"functions.h"
 
-1709844395 source:d:\cpp\snake\functions.cpp
+1709856642 source:d:\cpp\snake\functions.cpp
 	"functions.h"
 
-1709840918 d:\cpp\snake\functions.h
+1709856681 d:\cpp\snake\functions.h
 	<iostream>
 	<conio.h>
 	<thread>
