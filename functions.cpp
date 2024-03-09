@@ -1,9 +1,10 @@
 #include "functions.h"
 
-const short n = 8, BUFFER_SIZE = 3;
+const int TURNS_SIZE = N * N;
 
-char e = 254, sound = 7, head = '$', body = '*', tail = body, inputBuffer[BUFFER_SIZE], Map[n][n];
-short headPos[2] = {0, 0}, tailPos[2] = {0, 0}, bufferedInput = 0, length = 3, turns[n * n][4];
+bool gameOver = false;
+char e = 254, sound = 7, head = '$', body = '*', tail = body, food = '+', inputBuffer[BUFFER_SIZE], Map[N][N];
+short headPos[2] = {0, 0}, tailPos[2] = {0, 0}, bufferedInput = 0, length = INITIAL_LENGTH, turns[TURNS_SIZE][4];
 
 void clearScreen()
 {
@@ -12,9 +13,9 @@ void clearScreen()
 
 void mapPrinter()
 {
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < N; i++)
     {
-        for (int j = 0; j < n; j++)
+        for (int j = 0; j < N; j++)
             cout << Map[i][j] << " ";
         cout << endl;
     }
@@ -30,18 +31,26 @@ void reprint()
 
 void updatePosition(short hDir[2], short tDir[2], short (*&turnsFront)[4])
 {
-    short newHeadX = (headPos[0] + hDir[0] + n) % n, newHeadY = (headPos[1] + hDir[1] + n) % n;
-    if ((*turnsFront)[0] < n && tailPos[0] == (*turnsFront)[0] && tailPos[1] == (*turnsFront)[1])
+    short newHeadX = (headPos[0] + hDir[0] + N) % N, newHeadY = (headPos[1] + hDir[1] + N) % N;
+    if ((*turnsFront)[0] < N && tailPos[0] == (*turnsFront)[0] && tailPos[1] == (*turnsFront)[1])
     {
         tDir[(*turnsFront)[2]] = (*turnsFront)[3];
         tDir[((*turnsFront)[2] + 1) % 2] = 0;
-        (*turnsFront)[0] = n;
-        (*turnsFront)[1] = n;
-        turnsFront = &turns[(turnsFront - turns + 1) % (n * n)];
+        (*turnsFront)[0] = N;
+        (*turnsFront)[1] = N;
+        turnsFront = &turns[(turnsFront - turns + 1) % TURNS_SIZE];
     }
-    short newTailX = (tailPos[0] + tDir[0] + n) % n, newTailY = (tailPos[1] + tDir[1] + n) % n;
+    short newTailX = (tailPos[0] + tDir[0] + N) % N, newTailY = (tailPos[1] + tDir[1] + N) % N;
     Map[headPos[0]][headPos[1]] = body;
     Map[tailPos[0]][tailPos[1]] = e;
+    if(Map[newHeadX][newHeadY] == food){
+        newTailX = tailPos[0];
+        newTailY = tailPos[1];
+        Map[tailPos[0]][tailPos[1]] = tail;
+        length++;
+    }
+    else if( Map[newHeadX][newHeadY] != e)
+            gameOver = true;
     Map[newTailX][newTailY] = tail;
     Map[newHeadX][newHeadY] = head;
     headPos[0] = newHeadX;
@@ -50,33 +59,42 @@ void updatePosition(short hDir[2], short tDir[2], short (*&turnsFront)[4])
     tailPos[1] = newTailY;
 }
 
-void Initialize_variables()
+void initializeVariables()
 {
-    for (int i = 0; i < n; i++)
+    headPos[0] = 0;
+    headPos[1] = 0;
+    tailPos[0] = 0;
+    tailPos[1] = 0;
+    bufferedInput = 0;
+    length = INITIAL_LENGTH;
+    gameOver = false;
+    for (int i = 0; i < N; i++)
     {
         if (i < BUFFER_SIZE)
             inputBuffer[i] = e;
-        for (int j = 0; j < n; j++)
+        for (int j = 0; j < N; j++)
             Map[i][j] = e;
     }
     headPos[1] = length - 1;
     for (int i = 0; i < length; i++)
         Map[headPos[0]][i] = body;
-    for (int i = 0; i < n * n; i++)
+    for (int i = 0; i < TURNS_SIZE; i++)
     {
-        turns[i][0] = n;
-        turns[i][1] = n;
+        turns[i][0] = N;
+        turns[i][1] = N;
     }
 
     Map[headPos[0]][headPos[1]] = head;
     inputBuffer[0] = 'd';
 }
 
-bool isVertical(const char &input){
+bool isVertical(const char &input)
+{
     return input == 'w' || input == 's';
 }
 
-bool isHorizontal(const char &input){
+bool isHorizontal(const char &input)
+{
     return input == 'a' || input == 'd';
 }
 
@@ -88,18 +106,21 @@ bool isValidInput(const char &input, const char &previousInput)
 
 void changeDirection(const char &input, short headDir[2], short (*&turnsRear)[4])
 {
-//    if (isValidInput(input, previousInput))
-//    {
-        headDir[0] = input == 'w' ? -1 : input == 's' ? 1 : 0;
-        headDir[1] = input == 'a' ? -1 : input == 'd' ? 1 : 0;
-        (*turnsRear)[0] = headPos[0];
-        (*turnsRear)[1] = headPos[1];
-        (*turnsRear)[2] = headDir[0] ? 0 : 1;
-        (*turnsRear)[3] = headDir[0] ? headDir[0] : headDir[1];
-        turnsRear = &turns[(turnsRear - turns + 1) % (n * n)];
-//    }
+    //    if (isValidInput(input, previousInput))
+    //    {
+    headDir[0] = input == 'w' ? -1 : input == 's' ? 1
+                                                  : 0;
+    headDir[1] = input == 'a' ? -1 : input == 'd' ? 1
+                                                  : 0;
+    (*turnsRear)[0] = headPos[0];
+    (*turnsRear)[1] = headPos[1];
+    (*turnsRear)[2] = headDir[0] ? 0 : 1;
+    (*turnsRear)[3] = headDir[0] ? headDir[0] : headDir[1];
+    turnsRear = &turns[(turnsRear - turns + 1) % TURNS_SIZE];
+    //    }
 }
 
-char reverseInput(const char &input){
+char reverseInput(const char &input)
+{
     return isVertical(input) ? 'a' : 'w';
 }

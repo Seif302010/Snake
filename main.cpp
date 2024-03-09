@@ -2,63 +2,86 @@
 
 using namespace std;
 
-char *bufferFront = inputBuffer,*bufferRear = inputBuffer;
-short (*turnsFront)[4] = turns,(*turnsRear)[4] = turns;
+char currentInput, newInput, *bufferFront, *bufferRear;
+short headDir[2], tailDir[2], (*turnsFront)[4], (*turnsRear)[4];
 
-
+chrono::milliseconds delay(200);
 int main()
 {
-    short headDir[2] = {0, 1}, tailDir[2] = {headDir[0], headDir[1]};
-    Initialize_variables();
-    char currentInput = *bufferFront, newInput = *bufferFront;
-    chrono::milliseconds delay(200);
-    mapPrinter();
-    while (true)
+    char replay = 'y';
+    while (replay == 'y')
     {
-        this_thread::sleep_for(delay);
-        currentInput = bufferedInput ? *bufferRear : currentInput;
-        while (kbhit())
+        turnsFront = turns;
+        turnsRear = turns;
+        bufferFront = inputBuffer;
+        bufferRear = inputBuffer;
+        headDir[0] = 0;
+        headDir[1] = 1;
+        tailDir[0] = headDir[0];
+        tailDir[1] = headDir[1];
+        initializeVariables();
+        Map[5][5] = food;
+        currentInput = *bufferFront, newInput = *bufferFront;
+        reprint();
+        while (true)
         {
-            newInput = tolower(getch());
-            if (newInput == 'p')
+            this_thread::sleep_for(delay);
+            currentInput = bufferedInput ? *bufferRear : currentInput;
+            while (kbhit())
             {
-                cout << "game paused" << endl;
-                currentInput = bufferedInput % 2 ? reverseInput(currentInput) : currentInput;
-                bufferedInput = 0;
-                bufferFront = inputBuffer;
-                bufferRear = inputBuffer;
-                newInput = '0';
-                while (newInput != 'p')
+                newInput = tolower(getch());
+                if (newInput == 'p')
+                {
+                    cout << "game paused" << endl;
+                    currentInput = bufferedInput % 2 ? reverseInput(currentInput) : currentInput;
+                    bufferedInput = 0;
+                    bufferFront = inputBuffer;
+                    bufferRear = inputBuffer;
+                    newInput = '0';
+                    while (newInput != 'p')
+                        if (kbhit())
+                            newInput = tolower(getch());
+                    reprint();
+                    this_thread::sleep_for(delay);
                     if (kbhit())
                         newInput = tolower(getch());
-                reprint();
-                this_thread::sleep_for(delay);
-                if (kbhit())
-                    newInput = tolower(getch());
+                }
+                if (bufferedInput < BUFFER_SIZE && isValidInput(newInput, currentInput))
+                {
+                    *bufferRear = newInput;
+                    bufferedInput++;
+                    bufferRear = &inputBuffer[(bufferRear - inputBuffer + 1) % BUFFER_SIZE];
+                    currentInput = newInput;
+                    //                if(bufferedInput == BUFFER_SIZE){
+                    //                    clearScreen();
+                    //                    cout<<"the buffer is full "<<endl;
+                    //                    while(true);
+                    //                }
+                }
             }
-            if (bufferedInput < BUFFER_SIZE && isValidInput(newInput, currentInput))
+            if (bufferedInput > 0)
             {
-                *bufferRear = newInput;
-                bufferedInput++;
-                bufferRear = &inputBuffer[(bufferRear - inputBuffer + 1) % BUFFER_SIZE];
-                currentInput = newInput;
-//                if(bufferedInput == BUFFER_SIZE){
-//                    clearScreen();
-//                    cout<<"the buffer is full "<<endl;
-//                    while(true);
-//                }
-            }
-        }
-        if (bufferedInput > 0)
-        {
-            currentInput = *bufferFront;
-            bufferFront = &inputBuffer[(bufferFront - inputBuffer + 1) % BUFFER_SIZE];
-            bufferedInput--;
+                currentInput = *bufferFront;
+                bufferFront = &inputBuffer[(bufferFront - inputBuffer + 1) % BUFFER_SIZE];
+                bufferedInput--;
 
-            changeDirection(currentInput, headDir,turnsRear);
+                changeDirection(currentInput, headDir, turnsRear);
+            }
+            updatePosition(headDir, tailDir, turnsFront);
+            reprint();
+            if (gameOver)
+                break;
         }
-        updatePosition(headDir, tailDir,turnsFront);
-        reprint();
+        cout <<"GAME OVER" << endl;
+        cout << "Play again? (y,n)" << endl;
+        while (true)
+        {
+            replay = tolower(getch());
+            if (replay == '\n')
+                continue;
+            else if (replay == 'n' || replay == 'y')
+                break;
+        }
     }
     return 0;
 }
