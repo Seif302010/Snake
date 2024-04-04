@@ -1,6 +1,7 @@
 #include <iostream>
 #include <conio.h>
 #include <thread>
+#include <random>
 
 #define N 8
 #define BUFFER_SIZE 3
@@ -23,5 +24,6 @@ void initializeVariables();
 bool isValidInput(const char &input, const char &previousInput);
 void changeDirection(const char &input, short headDir[2], short (*&turnsFront)[4]);
 char reverseInput(const char &input);
+void generateFood();
 
 #endif // FUNCTIONS_H_INCLUDED

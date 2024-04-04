@@ -1,7 +1,5 @@
 #include "functions.h"
 
-using namespace std;
-
 char currentInput, newInput, *bufferFront, *bufferRear;
 short headDir[2], tailDir[2], (*turnsFront)[4], (*turnsRear)[4];
 
@@ -20,8 +18,8 @@ int main()
         tailDir[0] = headDir[0];
         tailDir[1] = headDir[1];
         initializeVariables();
-        Map[5][5] = food;
         currentInput = *bufferFront, newInput = *bufferFront;
+        generateFood();
         reprint();
         while (true)
         {
@@ -52,11 +50,6 @@ int main()
                     bufferedInput++;
                     bufferRear = &inputBuffer[(bufferRear - inputBuffer + 1) % BUFFER_SIZE];
                     currentInput = newInput;
-                    //                if(bufferedInput == BUFFER_SIZE){
-                    //                    clearScreen();
-                    //                    cout<<"the buffer is full "<<endl;
-                    //                    while(true);
-                    //                }
                 }
             }
             if (bufferedInput > 0)

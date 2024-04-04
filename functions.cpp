@@ -1,10 +1,14 @@
 #include "functions.h"
 
-const int TURNS_SIZE = N * N;
+const int MAP_AREA = N * N;
+
+random_device rd;
+mt19937 gen(rd());
+uniform_int_distribution<short> distribution(0, N - 1);
 
 bool gameOver = false;
 char e = 254, sound = 7, head = '$', body = '*', tail = body, food = '+', inputBuffer[BUFFER_SIZE], Map[N][N];
-short headPos[2] = {0, 0}, tailPos[2] = {0, 0}, bufferedInput = 0, length = INITIAL_LENGTH, turns[TURNS_SIZE][4];
+short headPos[2] = {0, 0}, tailPos[2] = {0, 0}, bufferedInput = 0, length = INITIAL_LENGTH, turns[MAP_AREA][4];
 
 void clearScreen()
 {
@@ -38,7 +42,7 @@ void updatePosition(short hDir[2], short tDir[2], short (*&turnsFront)[4])
         tDir[((*turnsFront)[2] + 1) % 2] = 0;
         (*turnsFront)[0] = N;
         (*turnsFront)[1] = N;
-        turnsFront = &turns[(turnsFront - turns + 1) % TURNS_SIZE];
+        turnsFront = &turns[(turnsFront - turns + 1) % MAP_AREA];
     }
     short newTailX = (tailPos[0] + tDir[0] + N) % N, newTailY = (tailPos[1] + tDir[1] + N) % N;
     Map[headPos[0]][headPos[1]] = body;
@@ -48,6 +52,7 @@ void updatePosition(short hDir[2], short tDir[2], short (*&turnsFront)[4])
         newTailY = tailPos[1];
         Map[tailPos[0]][tailPos[1]] = tail;
         length++;
+        generateFood();
     }
     else if( Map[newHeadX][newHeadY] != e)
             gameOver = true;
@@ -78,7 +83,7 @@ void initializeVariables()
     headPos[1] = length - 1;
     for (int i = 0; i < length; i++)
         Map[headPos[0]][i] = body;
-    for (int i = 0; i < TURNS_SIZE; i++)
+    for (int i = 0; i < MAP_AREA; i++)
     {
         turns[i][0] = N;
         turns[i][1] = N;
@@ -106,8 +111,6 @@ bool isValidInput(const char &input, const char &previousInput)
 
 void changeDirection(const char &input, short headDir[2], short (*&turnsRear)[4])
 {
-    //    if (isValidInput(input, previousInput))
-    //    {
     headDir[0] = input == 'w' ? -1 : input == 's' ? 1
                                                   : 0;
     headDir[1] = input == 'a' ? -1 : input == 'd' ? 1
@@ -116,11 +119,28 @@ void changeDirection(const char &input, short headDir[2], short (*&turnsRear)[4]
     (*turnsRear)[1] = headPos[1];
     (*turnsRear)[2] = headDir[0] ? 0 : 1;
     (*turnsRear)[3] = headDir[0] ? headDir[0] : headDir[1];
-    turnsRear = &turns[(turnsRear - turns + 1) % TURNS_SIZE];
-    //    }
+    turnsRear = &turns[(turnsRear - turns + 1) % MAP_AREA];
 }
 
 char reverseInput(const char &input)
 {
     return isVertical(input) ? 'a' : 'w';
+}
+
+void generateFood(){
+    short x = distribution(gen),y = distribution(gen);
+    bool isGenerated = false;
+    for(short i = 0; i < N; i++){
+        if(isGenerated)
+            break;
+        short X = (x + i) % N;
+        for(short j = 0; j <N; j++){
+            short Y = (y + j) % N;
+            if(Map[X][Y] == e){
+                Map[X][Y] = food;
+                isGenerated = true;
+                break;
+            }
+        }
+    }
 }
