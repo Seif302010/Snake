@@ -65,7 +65,7 @@ int main()
             if (gameOver)
                 break;
         }
-        cout <<"GAME OVER" << endl;
+        cout <<sound<<"GAME OVER" << endl;
         cout << "Play again? (y,n)" << endl;
         while (true)
         {
