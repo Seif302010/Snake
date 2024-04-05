@@ -12,6 +12,7 @@
 
 using namespace std;
 
+extern const int MAP_AREA;
 extern bool gameOver;
 extern char e, sound, head, body, tail, food, inputBuffer[BUFFER_SIZE], Map[][N];
 extern short headPos[2], tailPos[2], bufferedInput, length, turns[][4];

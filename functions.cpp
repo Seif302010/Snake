@@ -54,7 +54,7 @@ void updatePosition(short hDir[2], short tDir[2], short (*&turnsFront)[4])
         length++;
         generateFood();
     }
-    else if( Map[newHeadX][newHeadY] != e)
+    else if( Map[newHeadX][newHeadY] != e || length == MAP_AREA)
             gameOver = true;
     Map[newTailX][newTailY] = tail;
     Map[newHeadX][newHeadY] = head;

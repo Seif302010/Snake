@@ -62,10 +62,12 @@ int main()
             }
             updatePosition(headDir, tailDir, turnsFront);
             reprint();
-            if (gameOver)
+            if (gameOver){
+                cout <<sound<< (length == MAP_AREA? "You Win" : "GAME OVER") << endl;
                 break;
+            }
+
         }
-        cout <<sound<<"GAME OVER" << endl;
         cout << "Play again? (y,n)" << endl;
         while (true)
         {
