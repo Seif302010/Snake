@@ -6,9 +6,9 @@ random_device rd;
 mt19937 gen(rd());
 uniform_int_distribution<short> distribution(0, N - 1);
 
-bool gameOver = false;
+bool gameOver = false, newFood = true;
 char e = 254, sound = 7, head = '$', body = '*', tail = body, food = '+', inputBuffer[BUFFER_SIZE], Map[N][N];
-short headPos[2] = {0, 0}, tailPos[2] = {0, 0}, bufferedInput = 0, length = INITIAL_LENGTH, turns[MAP_AREA][4];
+short headPos[2] = {0, 0}, tailPos[2] = {0, 0}, foodPos[2], bufferedInput = 0, length = INITIAL_LENGTH, turns[MAP_AREA][4];
 
 void clearScreen()
 {
@@ -32,10 +32,15 @@ void reprint()
     clearScreen();
     mapPrinter();
 }
+void updateArray(short arr1[], short arr2[], short n)
+{
+    for (short i = 0; i < n; i++)
+        arr1[i] = arr2[i];
+}
 
 void updatePosition(short hDir[2], short tDir[2], short (*&turnsFront)[4])
 {
-    short newHeadX = (headPos[0] + hDir[0] + N) % N, newHeadY = (headPos[1] + hDir[1] + N) % N;
+    short newHead[2] = {short((headPos[0] + hDir[0] + N) % N), short((headPos[1] + hDir[1] + N) % N)};
     if ((*turnsFront)[0] < N && tailPos[0] == (*turnsFront)[0] && tailPos[1] == (*turnsFront)[1])
     {
         tDir[(*turnsFront)[2]] = (*turnsFront)[3];
@@ -44,36 +49,33 @@ void updatePosition(short hDir[2], short tDir[2], short (*&turnsFront)[4])
         (*turnsFront)[1] = N;
         turnsFront = &turns[(turnsFront - turns + 1) % MAP_AREA];
     }
-    short newTailX = (tailPos[0] + tDir[0] + N) % N, newTailY = (tailPos[1] + tDir[1] + N) % N;
+    short newTail[2] = {short((tailPos[0] + tDir[0] + N) % N), short((tailPos[1] + tDir[1] + N) % N)};
     Map[headPos[0]][headPos[1]] = body;
     Map[tailPos[0]][tailPos[1]] = e;
-    if (Map[newHeadX][newHeadY] == food)
+    if (Map[newHead[0]][newHead[1]] == food)
     {
-        newTailX = tailPos[0];
-        newTailY = tailPos[1];
+        updateArray(newTail, tailPos, 2);
         Map[tailPos[0]][tailPos[1]] = tail;
         length++;
         generateFood();
     }
-    else if (Map[newHeadX][newHeadY] != e || length == MAP_AREA)
+    else if (Map[newHead[0]][newHead[1]] != e || length == MAP_AREA)
         gameOver = true;
-    Map[newTailX][newTailY] = tail;
-    Map[newHeadX][newHeadY] = head;
-    headPos[0] = newHeadX;
-    headPos[1] = newHeadY;
-    tailPos[0] = newTailX;
-    tailPos[1] = newTailY;
+    Map[newTail[0]][newTail[1]] = tail;
+    Map[newHead[0]][newHead[1]] = head;
+    updateArray(headPos, newHead, 2);
+    updateArray(tailPos, newTail, 2);
 }
 
 void initializeVariables()
 {
-    headPos[0] = 0;
-    headPos[1] = 0;
-    tailPos[0] = 0;
-    tailPos[1] = 0;
+    short initial[2] = {0, 0};
+    updateArray(headPos, initial, 2);
+    updateArray(tailPos, initial, 2);
     bufferedInput = 0;
     length = INITIAL_LENGTH;
     gameOver = false;
+    newFood = true;
     for (int i = 0; i < N; i++)
     {
         if (i < BUFFER_SIZE)
@@ -131,10 +133,10 @@ char reverseInput(const char &input)
 void generateFood()
 {
     short x = distribution(gen), y = distribution(gen);
-    bool isGenerated = false;
+    newFood = false;
     for (short i = 0; i < N; i++)
     {
-        if (isGenerated)
+        if (newFood)
             break;
         short X = (x + i) % N;
         for (short j = 0; j < N; j++)
@@ -142,8 +144,10 @@ void generateFood()
             short Y = (y + j) % N;
             if (Map[X][Y] == e)
             {
+                short newFoodPos[2] = {X, Y};
                 Map[X][Y] = food;
-                isGenerated = true;
+                updateArray(foodPos, newFoodPos, 2);
+                newFood = true;
                 break;
             }
         }
