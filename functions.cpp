@@ -12,7 +12,7 @@ short headPos[2] = {0, 0}, tailPos[2] = {0, 0}, bufferedInput = 0, length = INIT
 
 void clearScreen()
 {
-    system("cls");
+    system(CLEAR_SCREEN);
 }
 
 void mapPrinter()
@@ -47,15 +47,16 @@ void updatePosition(short hDir[2], short tDir[2], short (*&turnsFront)[4])
     short newTailX = (tailPos[0] + tDir[0] + N) % N, newTailY = (tailPos[1] + tDir[1] + N) % N;
     Map[headPos[0]][headPos[1]] = body;
     Map[tailPos[0]][tailPos[1]] = e;
-    if(Map[newHeadX][newHeadY] == food){
+    if (Map[newHeadX][newHeadY] == food)
+    {
         newTailX = tailPos[0];
         newTailY = tailPos[1];
         Map[tailPos[0]][tailPos[1]] = tail;
         length++;
         generateFood();
     }
-    else if( Map[newHeadX][newHeadY] != e || length == MAP_AREA)
-            gameOver = true;
+    else if (Map[newHeadX][newHeadY] != e || length == MAP_AREA)
+        gameOver = true;
     Map[newTailX][newTailY] = tail;
     Map[newHeadX][newHeadY] = head;
     headPos[0] = newHeadX;
@@ -127,16 +128,20 @@ char reverseInput(const char &input)
     return isVertical(input) ? 'a' : 'w';
 }
 
-void generateFood(){
-    short x = distribution(gen),y = distribution(gen);
+void generateFood()
+{
+    short x = distribution(gen), y = distribution(gen);
     bool isGenerated = false;
-    for(short i = 0; i < N; i++){
-        if(isGenerated)
+    for (short i = 0; i < N; i++)
+    {
+        if (isGenerated)
             break;
         short X = (x + i) % N;
-        for(short j = 0; j <N; j++){
+        for (short j = 0; j < N; j++)
+        {
             short Y = (y + j) % N;
-            if(Map[X][Y] == e){
+            if (Map[X][Y] == e)
+            {
                 Map[X][Y] = food;
                 isGenerated = true;
                 break;

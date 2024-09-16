@@ -1,7 +1,16 @@
 #include <iostream>
-#include <conio.h>
 #include <thread>
 #include <random>
+#include <conio.h>
+
+#ifdef _WIN32
+#include <windows.h>
+#define CLEAR_SCREEN "cls"
+#define SQUARE string(1, char(254)).c_str()
+#else
+#define CLEAR_SCREEN "clear"
+#define SQUARE string("\u25a0").c_str()
+#endif
 
 #define N 8
 #define BUFFER_SIZE 3
