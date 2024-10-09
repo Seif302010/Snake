@@ -2,4 +2,6 @@
 **/*.o
 **/*.obj
 **/*.res
+**/*.7z
+**/*.tar.xz
 /.vscode

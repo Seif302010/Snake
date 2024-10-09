@@ -34,8 +34,7 @@ void reprint()
 }
 void updateArray(short arr1[], short arr2[], short n)
 {
-    for (short i = 0; i < n; i++)
-        arr1[i] = arr2[i];
+    copy(arr2, arr2 + n, arr1);
 }
 
 void updatePosition(short hDir[2], short tDir[2], short (*&turnsFront)[4])
